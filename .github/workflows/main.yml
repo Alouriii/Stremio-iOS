@@ -1,21 +1,34 @@
-name: Build IPA
-on: [push]
-jobs:
-  build:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
-      - name: Build Project
-        run: |
-          cd Stremio-iOS
-          pod install
-          xcodebuild -workspace Stremio.xcworkspace -scheme Stremio -destination 'generic/platform=iOS' clean archive -archivePath Stremio.xcarchive
-      - name: Export IPA
-        run: |
-          xcodebuild -exportArchive -archivePath Stremio.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath .
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Stremio.ipa
-          path: Stremio.ipa
+‏name: Build IPA
+‏on: [push]
+‏jobs:
+‏  build:
+‏    runs-on: macos-latest
+‏    env:
+‏      DEVELOPER_TEAM: ABC1234XYZ  
+‏      CODE_SIGN_STYLE: Automatic
+‏    steps:
+‏      - uses: actions/checkout@v4
+
+‏      - name: Install CocoaPods
+‏        run: |
+‏          sudo gem install cocoapods -v 1.14.2
+
+‏      - name: Install Dependencies
+‏        run: |
+‏          cd Stremio-iOS
+‏          pod install
+
+‏      - name: Build Project
+‏        run: |
+‏          cd Stremio-iOS
+‏          xcodebuild -workspace Stremio.xcworkspace -scheme Stremio -destination 'generic/platform=iOS' clean archive -archivePath Stremio.xcarchive
+
+‏      - name: Export IPA
+‏        run: |
+‏          cd Stremio-iOS
+‏          xcodebuild -exportArchive -archivePath Stremio.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./output
+
+‏      - uses: actions/upload-artifact@v4
+‏        with:
+‏          name: Stremio.ipa
+‏          path: ./Stremio-iOS/output/Stremio.ipa
